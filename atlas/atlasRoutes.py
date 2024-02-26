@@ -263,6 +263,24 @@ def ficheEspece(cd_nom):
 
     organisms = vmOrganismsRepository.getListOrganism(connection, cd_ref)
 
+    sort_medias_last = current_app.config["MEDIAS_TOOLS"]["SORT_LAST_MEDIAS"]
+    if sort_medias_last:
+        pattern_for_last_medias = current_app.config["MEDIAS_TOOLS"]["SORT_LAST_MEDIAS_PATTERN"]
+        # ReOrder articles based on pattern
+        matching_paths = []
+        non_matching_paths = []
+
+        # Separate paths based on whether they match the regex pattern
+        for item in articles:
+            if  utils.regex_filter(item['path'],pattern_for_last_medias):
+                matching_paths.append(item)
+            else:
+                non_matching_paths.append(item)
+
+        # Concatenate the two lists to reorder them
+        final_list_articles = non_matching_paths + matching_paths
+    else:
+        final_list_articles = articles
     connection.close()
     db_session.close()
 
@@ -280,7 +298,7 @@ def ficheEspece(cd_nom):
         firstPhoto=firstPhoto,
         photoCarousel=photoCarousel,
         videoAudio=videoAudio,
-        articles=articles,
+        articles=final_list_articles,
         taxonDescription=taxonDescription,
         observers=observers,
         organisms=organisms,

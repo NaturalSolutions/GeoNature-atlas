@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-
+import re
 from sqlalchemy import MetaData
 from sqlalchemy import create_engine
 from sqlalchemy.pool import QueuePool
@@ -84,3 +84,7 @@ class GenericTable:
             fprops = self.serialize_columns
 
         return {item: _serializer(getattr(data, item)) for item, _serializer in fprops}
+
+
+def regex_filter(value, pattern):
+    return re.search(pattern, value)

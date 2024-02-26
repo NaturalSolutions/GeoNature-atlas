@@ -77,6 +77,13 @@ LANGUAGES = {
     },
 }
 
+MEDIAS_TOOLS = {
+    'SORT_COL':'date_media',
+    'SORT_ORDER': 'DESC',
+    'SORT_LAST_MEDIAS':False,
+    'SORT_LAST_MEDIAS_PATTERN':r"xxxxx"
+}
+
 
 class SecretSchemaConf(Schema):
     class Meta:
@@ -208,6 +215,8 @@ class AtlasConfig(Schema):
     # (no need to restart the atlas service when updating templates)
     # Defaults to False to have the best performance in production
     TEMPLATES_AUTO_RELOAD = fields.Boolean(load_default=False)
+    MEDIAS_TOOLS = fields.Dict(load_default=MEDIAS_TOOLS)
+
 
     @validates_schema
     def validate_url_taxhub(self, data, **kwargs):
@@ -218,3 +227,12 @@ class AtlasConfig(Schema):
             raise ValidationError(
                 {"Le champ TAXHUB_URL doit être rempli si REDIMENSIONNEMENT_IMAGE = True"}
             )
+      
+    @validates_schema
+    def validate_sort_dir(self, data, **kwargs):
+        sort_order = data['MEDIAS_TOOLS']['SORT_ORDER']
+        if sort_order not in ['ASC','DESC']:
+            raise ValidationError(
+                f"The specified sort order '{sort_order}' is not possible . You should use 'ASC' or 'DESC'."
+            )
+

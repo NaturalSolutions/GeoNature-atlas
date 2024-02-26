@@ -150,12 +150,18 @@ def getVideo_and_audio(connection, cd_ref, id5, id6, id7, id8, id9):
 
 
 def getLinks_and_articles(connection, cd_ref, id3, id4):
+    schema_name = 'atlas'
+    view_name = 'vm_medias'
     sql = """
         SELECT *
         FROM atlas.vm_medias
         WHERE id_type IN (:id3, :id4) AND cd_ref = :thiscdref
-        ORDER BY date_media DESC
     """
+    order_by_col = current_app.config["MEDIAS_TOOLS"]["SORT_COL"]
+    sort_order = current_app.config["MEDIAS_TOOLS"]["SORT_ORDER"]
+    utils.check_database_column_existence(connection,order_by_col,schema_name,view_name)
+    # Add ORDER BY clause
+    sql += f" ORDER BY {order_by_col} {sort_order}"
     req = connection.execute(text(sql), thiscdref=cd_ref, id3=id3, id4=id4)
     return [_format_media(r) for r in req]
 
